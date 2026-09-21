@@ -184,23 +184,23 @@ Folders appear as their initial contributions are committed.
 
 
 
-\[Member 1 Full Name]
+\[Prapti Dodal]
 
 
 
-\[Member 2 Full Name]
+\[Twinkle Singh]
 
 
 
-\[Member 3 Full Name]
+\[Tanvi Ballal]
 
 
 
-\[Member 4 Full Name]
+\[Rujuta Dani]
 
 
 
-\[Member 5 Full Name]
+\[Rashita Gomes]
 
 
 
