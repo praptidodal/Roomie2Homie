@@ -1,22 +1,40 @@
 # Dependencies
-node_modules/
+**/node_modules/
 
 # Build output
-dist/
-build/
-coverage/
+**/dist/
+**/dist-ssr/
+**/build/
+**/coverage/
 
 # Local environment and secrets
 .env
 .env.*
+**/.env
+**/.env.*
 !.env.example
+!**/.env.example
+
+# Local files
+*.local
 
 # Logs
+logs/
+**/logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Editor and operating system files
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
