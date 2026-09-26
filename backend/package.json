@@ -1,11 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,8 @@
   "type": "module",
   "dependencies": {
     "cors": "^2.8.6",
-    "dotenv": "^18.0.1",
+    "dotenv": "^18.0.4",
     "express": "^5.2.1"
-  }
+  },
+  "description": ""
 }
