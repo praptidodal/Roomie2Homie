@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { connectDatabase } from "./config/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,21 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+/*app.listen(PORT, () => {
   console.log(`Roomie2Homie backend running at http://localhost:${PORT}`);
-});
+});*/
+
+async function startServer() {
+  try {
+    await connectDatabase();
+
+    app.listen(PORT, () => {
+      console.log(`Roomie2Homie backend running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
