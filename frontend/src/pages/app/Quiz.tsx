@@ -1,24 +1,53 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, SparklesIcon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckIcon,
+} from 'lucide-react';
 import type { Lifestyle } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { CompatibilityRing } from '../../components/ui/CompatibilityRing';
 import { api } from '../../services/api';
-import { currentUserLifestyle, quizQuestions } from '../../data/mock';
+import { quizQuestions } from '../../data/mock';
 
 export function Quiz() {
   const { user, update } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Partial<Lifestyle>>(
-    user?.quizCompleted ? currentUserLifestyle : {}
-  );
+  const [answers, setAnswers] = useState<Partial<Lifestyle>>({});
+  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSavedAnswers() {
+      try {
+        const data = (await api.getMyProfile()) as {
+          profile: {
+            lifestyle?: Partial<Lifestyle>;
+          } | null;
+        };
+
+        if (!cancelled && data.profile?.lifestyle) {
+          setAnswers(data.profile.lifestyle);
+        }
+      } catch (error) {
+        console.error("Unable to load lifestyle answers:", error);
+      }
+    }
+
+    if (user) {
+      loadSavedAnswers();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const total = quizQuestions.length;
   const q = quizQuestions[step];
@@ -32,33 +61,48 @@ export function Quiz() {
 
   async function finish() {
     setSaving(true);
-    // TODO: PATCH /api/users/me/lifestyle
-    await api.saveLifestyle(answers);
-    setSaving(false);
-    update({ quizCompleted: true, profileStrength: 88 });
-    setDone(true);
+    setError("");
+
+    try {
+      await api.saveLifestyle(answers);
+
+      update({
+        quizCompleted: true,
+      });
+
+      setDone(true);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to save lifestyle quiz"
+      );
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (done)
-  return (
-    <div className="mx-auto max-w-2xl">
+    return (
+      <div className="mx-auto max-w-2xl">
         <Card className="text-center">
           <div className="flex flex-col items-center py-8">
-            <CompatibilityRing score={94} tone="mint" size="lg" caption="Top match" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-mint-100 text-mint-600">
+              <CheckIcon className="h-10 w-10" aria-hidden />
+            </div>
             <h1 className="mt-6 font-display text-2xl font-extrabold text-navy-900">
               Your lifestyle profile is ready
             </h1>
             <p className="mt-2 max-w-md text-sm text-navy-500">
-              We found 6 people in your city above 60% compatibility, including one at 94%.
+              Your answers were saved successfully and will be used to calculate your roommate compatibility.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button
-              variant="gradient"
-              size="lg"
-              onClick={() => navigate('/app/discover')}
-              icon={<SparklesIcon className="h-4 w-4" aria-hidden />}>
-              
-                See my matches
+                variant="gradient"
+                size="lg"
+                onClick={() => navigate('/app/profile')}
+              >
+                View my profile
               </Button>
               <Button variant="secondary" size="lg" onClick={() => navigate('/app/dashboard')}>
                 Go to dashboard
@@ -84,7 +128,7 @@ export function Quiz() {
           <div
             className="h-full rounded-full bg-violet-coral"
             style={{ width: `${progress}%`, transition: 'width 220ms cubic-bezier(0.23,1,0.32,1)' }} />
-          
+
         </div>
       </div>
 
@@ -94,7 +138,7 @@ export function Quiz() {
           initial={{ opacity: 0, x: 18 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}>
-          
+
           <h1 className="font-display text-2xl font-extrabold tracking-tight text-navy-900">
             {q.question}
           </h1>
@@ -109,19 +153,17 @@ export function Quiz() {
                     type="button"
                     onClick={() => choose(opt.value)}
                     aria-pressed={selected}
-                    className={`flex w-full items-center justify-between gap-3 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-colors duration-150 ease-out ${
-                    selected ?
-                    'border-violet-500 bg-violet-50 text-violet-700' :
-                    'border-cream-300 bg-white text-navy-700 hover:border-violet-200 hover:bg-cream-200'}`
+                    className={`flex w-full items-center justify-between gap-3 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-colors duration-150 ease-out ${selected ?
+                        'border-violet-500 bg-violet-50 text-violet-700' :
+                        'border-cream-300 bg-white text-navy-700 hover:border-violet-200 hover:bg-cream-200'}`
                     }>
-                    
+
                     {opt.label}
                     <span
-                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${
-                      selected ? 'border-violet-500 bg-violet-500 text-white' : 'border-cream-300'}`
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${selected ? 'border-violet-500 bg-violet-500 text-white' : 'border-cream-300'}`
                       }
                       aria-hidden>
-                      
+
                       {selected && <CheckIcon className="h-3.5 w-3.5" />}
                     </span>
                   </button>
@@ -137,31 +179,35 @@ export function Quiz() {
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
             icon={<ArrowLeftIcon className="h-4 w-4" aria-hidden />}>
-            
+
             Back
           </Button>
           {step < total - 1 ?
-          <Button
-            variant="secondary"
-            onClick={() => setStep((s) => s + 1)}
-            disabled={current === undefined}
-            icon={<ArrowRightIcon className="h-4 w-4" aria-hidden />}>
-            
+            <Button
+              variant="secondary"
+              onClick={() => setStep((s) => s + 1)}
+              disabled={current === undefined}
+              icon={<ArrowRightIcon className="h-4 w-4" aria-hidden />}>
+
               Next
             </Button> :
 
-          <Button
-            variant="gradient"
-            loading={saving}
-            disabled={Object.keys(answers).length < total}
-            onClick={finish}>
-            
+            <Button
+              variant="gradient"
+              loading={saving}
+              disabled={Object.keys(answers).length < total}
+              onClick={finish}>
+
               Finish & see matches
             </Button>
           }
         </div>
       </Card>
-
+      {error && (
+        <p className="mt-4 text-center text-sm font-semibold text-coral-500">
+          {error}
+        </p>
+      )}
       <p className="mt-4 text-center text-xs text-navy-500">
         You can retake this quiz anytime from your profile.
       </p>

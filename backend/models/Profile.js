@@ -22,7 +22,7 @@ const profileSchema = new mongoose.Schema(
 
     gender: {
       type: String,
-      trim: true,
+      enum: ["female", "male", "non_binary"],
     },
 
     occupation: {
@@ -65,6 +65,85 @@ const profileSchema = new mongoose.Schema(
     profilePhoto: {
       type: String,
       default: "",
+    },
+
+    languages: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    interests: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    hasRoom: {
+      type: Boolean,
+      default: false,
+    },
+
+    lifestyle: {
+      sleep: {
+        type: String,
+        enum: ["early_bird", "flexible", "night_owl"],
+      },
+
+      cleanliness: {
+        type: String,
+        enum: ["very_tidy", "tidy", "relaxed"],
+      },
+
+      social: {
+        type: String,
+        enum: ["homebody", "balanced", "very_social"],
+      },
+
+      food: {
+        type: String,
+        enum: [
+          "vegetarian",
+          "eggetarian",
+          "non_vegetarian",
+          "jain",
+        ],
+      },
+
+      smoking: {
+        type: String,
+        enum: ["no", "occasionally", "yes"],
+      },
+
+      pets: {
+        type: Boolean,
+      },
+
+      guests: {
+        type: String,
+        enum: ["rarely", "sometimes", "often"],
+      },
+
+      workFromHome: {
+        type: Boolean,
+      },
+
+      music: {
+        type: String,
+        enum: ["headphones", "low_speaker", "loud"],
+      },
+
+      fitness: {
+        type: String,
+        enum: ["gym_daily", "sometimes", "not_really"],
+      },
+    },
+
+    quizCompleted: {
+      type: Boolean,
+      default: false,
     },
 
     isVerified: {

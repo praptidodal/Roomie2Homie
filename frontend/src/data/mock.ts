@@ -193,7 +193,7 @@ export const profiles: Profile[] = [
 
 function factors(p: Profile, score: number) {
   const you = currentUserLifestyle;
-  const label = (key: keyof Lifestyle, value: unknown) => {
+  const label = (_key: keyof Lifestyle, value: unknown) => {
     const map: Record<string, string> = {
       early_bird: 'Early bird (up by 6am)',
       flexible: 'Flexible schedule',
@@ -290,29 +290,61 @@ p.interests.filter((i) =>
 ['Filter coffee', 'Trekking', 'Cooking', 'Books', 'Yoga', 'Podcasts', 'Indie music'].includes(i)
 );
 
-export const matches: MatchCandidate[] = [
-{ profile: profiles[0], score: 94, status: 'suggested' },
-{ profile: profiles[3], score: 91, status: 'incoming' },
-{ profile: profiles[1], score: 86, status: 'accepted' },
-{ profile: profiles[2], score: 78, status: 'sent' },
-{ profile: profiles[4], score: 74, status: 'suggested' },
-{ profile: profiles[5], score: 64, status: 'suggested' }].
-map((m) => ({
-  ...m,
-  sharedInterests: shared(m.profile),
-  factors: factors(m.profile, m.score),
+const matchSeeds: Array<
+  Pick<MatchCandidate, 'profile' | 'score' | 'status'>
+> = [
+  {
+    profile: profiles[0],
+    score: 94,
+    status: 'suggested',
+  },
+  {
+    profile: profiles[3],
+    score: 91,
+    status: 'incoming',
+  },
+  {
+    profile: profiles[1],
+    score: 86,
+    status: 'accepted',
+  },
+  {
+    profile: profiles[2],
+    score: 78,
+    status: 'sent',
+  },
+  {
+    profile: profiles[4],
+    score: 74,
+    status: 'suggested',
+  },
+  {
+    profile: profiles[5],
+    score: 64,
+    status: 'suggested',
+  },
+];
+
+export const matches: MatchCandidate[] = matchSeeds.map((match) => ({
+  ...match,
+
+  sharedInterests: shared(match.profile),
+
+  factors: factors(match.profile, match.score),
+
   requestedAt:
-  m.status === 'incoming' ?
-  '2 hours ago' :
-  m.status === 'sent' ?
-  'Yesterday' :
-  m.status === 'accepted' ?
-  '4 days ago' :
-  undefined,
+    match.status === 'incoming'
+      ? '2 hours ago'
+      : match.status === 'sent'
+        ? 'Yesterday'
+        : match.status === 'accepted'
+          ? '4 days ago'
+          : undefined,
+
   message:
-  m.status === 'incoming' ?
-  'Hey! We both work from home and want a quiet flat in Indiranagar. Want to see a place together this weekend?' :
-  undefined
+    match.status === 'incoming'
+      ? 'Hey! We both work from home and want a quiet flat in Indiranagar. Want to see a place together this weekend?'
+      : undefined,
 }));
 
 export const rooms: Room[] = [
@@ -573,6 +605,26 @@ export const quizQuestions: Array<{
   { value: 'low_speaker', label: 'Speaker on low' },
   { value: 'loud', label: 'Loud and proud' }]
 
+},
+{
+  key: 'guests',
+  question: 'How often do you invite guests home?',
+  helper: 'This helps avoid conflicts about visitors and shared spaces.',
+  options: [
+    { value: 'rarely', label: 'Rarely' },
+    { value: 'sometimes', label: 'Sometimes' },
+    { value: 'often', label: 'Often' },
+  ],
+},
+{
+  key: 'fitness',
+  question: 'How often do you exercise?',
+  helper: 'Daily routines can affect shared schedules.',
+  options: [
+    { value: 'gym_daily', label: 'Almost every day' },
+    { value: 'sometimes', label: 'Sometimes' },
+    { value: 'not_really', label: 'Not regularly' },
+  ],
 }];
 
 
