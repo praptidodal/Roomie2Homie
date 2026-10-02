@@ -302,15 +302,18 @@ export function Profile() {
 
       setProfilePhoto(photoUrl);
 
-      update({
-        avatar: photoUrl,
-        profileStrength: hadPhoto
-          ? user.profileStrength
-          : Math.min(
-              100,
-              user.profileStrength + 10
-            ),
-      });
+      const currentProfileStrength =
+  user?.profileStrength ?? 0;
+
+update({
+  avatar: photoUrl,
+  profileStrength: hadPhoto
+    ? currentProfileStrength
+    : Math.min(
+        100,
+        currentProfileStrength + 10
+      ),
+});
 
       setToast(
         'Profile photo updated successfully'
