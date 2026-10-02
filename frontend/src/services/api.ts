@@ -5,8 +5,9 @@ import type {
   Lifestyle,
   MatchCandidate,
   Profile,
-  Room } from
-'../types';
+  Room,
+} from '../types';
+
 import {
   adminStats,
   matches,
@@ -14,87 +15,272 @@ import {
   notifications,
   profiles,
   rooms,
-  threads } from
-'../data/mock';
+  threads,
+} from '../data/mock';
 
-/**
- * ---------------------------------------------------------------------------
- * API INTEGRATION PLACEHOLDERS
- * ---------------------------------------------------------------------------
- * Everything below is mock-only and resolves from data/mock.ts. When the
- * Node.js + Express + MongoDB backend is ready, replace each function body
- * with the matching REST call (axios/fetch against API_BASE_URL) and drop in
- * the Socket.IO client for chat, notifications and presence.
- *
- *   BASE            GET/POST/PATCH
- *   /api/auth       login, register, me, logout            (JWT in httpOnly cookie)
- *   /api/users      profile, lifestyle quiz, preferences   (MongoDB `users`)
- *   /api/matches    suggestions, request, accept, decline  (MongoDB `matches`)
- *   /api/rooms      list, detail, create, save             (MongoDB `rooms`)
- *   /api/chat       threads, messages                      (Socket.IO `message`,
- *                                                           `typing`, `presence`)
- *   /api/notifications  list, mark-read                    (Socket.IO `notify`)
- *   /api/verification   submit documents, status           (Multer + S3/Cloudinary)
- *   /api/admin      stats, verification queue, reports
- *
- * Socket.IO events to wire later:
- *   socket.on('message')   -> append to the open thread
- *   socket.on('typing')    -> show the typing indicator
- *   socket.on('presence')  -> online/offline dots
- *   socket.on('notify')    -> bump the navbar bell
- */
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000/api';
 
-export const API_BASE_URL = '/api'; // TODO: point at the Express server
-export const SOCKET_URL = '/'; // TODO: point at the Socket.IO namespace
+export const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL ||
+  'http://localhost:5000';
 
-function delay<T>(value: T, ms = 380): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+const TOKEN_KEY = 'roomie2homie.token';
+
+function delay<T>(
+  value: T,
+  milliseconds = 380
+): Promise<T> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(value), milliseconds);
+  });
+}
+
+async function authenticatedRequest<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error('Please log in again');
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}${path}`,
+    {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        ...options.headers,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || 'Request failed'
+    );
+  }
+
+  return data as T;
+}
+
+async function uploadRequest<T>(
+  path: string,
+  formData: FormData
+): Promise<T> {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error('Please log in again');
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}${path}`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || 'File upload failed'
+    );
+  }
+
+  return data as T;
 }
 
 export const api = {
-  /** POST /api/auth/login */
-  login: (email: string, _password: string) =>
-  delay({ ok: true as const, email }),
-  /** POST /api/auth/register */
-  register: (payload: {name: string;email: string;city: string;}) =>
-  delay({ ok: true as const, ...payload }),
+  /*
+   * Authentication is currently handled by AuthContext.
+   * These functions remain only for compatibility with
+   * existing frontend components.
+   */
+  login: (
+    email: string,
+    _password: string
+  ) =>
+    delay({
+      ok: true as const,
+      email,
+    }),
 
-  /** GET /api/users/:id */
-  getProfile: (id: string): Promise<Profile | undefined> =>
-  delay(profiles.find((p) => p.id === id)),
+  register: (payload: {
+    name: string;
+    email: string;
+    city: string;
+  }) =>
+    delay({
+      ok: true as const,
+      ...payload,
+    }),
+
+  /*
+   * PROFILE AND LIFESTYLE
+   * These functions use the real Express and MongoDB APIs.
+   */
+
+  /** GET /api/users/me */
+  getMyProfile: () =>
+    authenticatedRequest('/users/me'),
+
+  /** PATCH /api/users/me */
+  updateMyProfile: (
+    profile: Record<string, unknown>
+  ) =>
+    authenticatedRequest('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify(profile),
+    }),
 
   /** PATCH /api/users/me/lifestyle */
-  saveLifestyle: (answers: Partial<Lifestyle>) => delay({ ok: true as const, answers }),
+  saveLifestyle: (
+    answers: Partial<Lifestyle>
+  ) =>
+    authenticatedRequest(
+      '/users/me/lifestyle',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(answers),
+      }
+    ),
+
+  /** PATCH /api/users/me/photo */
+  uploadProfilePhoto: (file: File) => {
+    const formData = new FormData();
+
+    formData.append(
+      'profilePhoto',
+      file
+    );
+
+    return uploadRequest<{
+      success: boolean;
+      message: string;
+      profilePhoto: string;
+    }>(
+      '/users/me/photo',
+      formData
+    );
+  },
+
+  /*
+   * The modules below still use template data.
+   * They will be replaced by the assigned team members.
+   */
+
+  /** GET /api/users/:id */
+  getProfile: (
+    id: string
+  ): Promise<Profile | undefined> =>
+    delay(
+      profiles.find(
+        (profile) => profile.id === id
+      )
+    ),
 
   /** GET /api/matches/suggestions */
-  getMatches: (): Promise<MatchCandidate[]> => delay(matches),
+  getMatches: (): Promise<
+    MatchCandidate[]
+  > =>
+    delay(matches),
 
-  /** POST /api/matches/:id/request | /accept | /decline */
-  updateMatch: (id: string, action: 'request' | 'accept' | 'decline') =>
-  delay({ ok: true as const, id, action }),
+  /**
+   * POST /api/matches/:id/request
+   * POST /api/matches/:id/accept
+   * POST /api/matches/:id/decline
+   */
+  updateMatch: (
+    id: string,
+    action:
+      | 'request'
+      | 'accept'
+      | 'decline'
+  ) =>
+    delay({
+      ok: true as const,
+      id,
+      action,
+    }),
 
   /** GET /api/rooms */
-  getRooms: (): Promise<Room[]> => delay(rooms),
+  getRooms: (): Promise<Room[]> =>
+    delay(rooms),
+
   /** GET /api/rooms/:id */
-  getRoom: (id: string): Promise<Room | undefined> =>
-  delay(rooms.find((r) => r.id === id)),
+  getRoom: (
+    id: string
+  ): Promise<Room | undefined> =>
+    delay(
+      rooms.find(
+        (room) => room.id === id
+      )
+    ),
 
   /** GET /api/chat/threads */
-  getThreads: (): Promise<ChatThread[]> => delay(threads),
+  getThreads: (): Promise<
+    ChatThread[]
+  > =>
+    delay(threads),
+
   /** GET /api/chat/:threadId/messages */
-  getMessages: (threadId: string): Promise<ChatMessage[]> =>
-  delay(messages.filter((m) => m.threadId === threadId)),
-  /** socket.emit('message', …) */
-  sendMessage: (threadId: string, body: string) =>
-  delay({ ok: true as const, threadId, body }, 160),
+  getMessages: (
+    threadId: string
+  ): Promise<ChatMessage[]> =>
+    delay(
+      messages.filter(
+        (message) =>
+          message.threadId === threadId
+      )
+    ),
+
+  /** Socket message placeholder */
+  sendMessage: (
+    threadId: string,
+    body: string
+  ) =>
+    delay(
+      {
+        ok: true as const,
+        threadId,
+        body,
+      },
+      160
+    ),
 
   /** GET /api/notifications */
-  getNotifications: (): Promise<AppNotification[]> => delay(notifications),
+  getNotifications: (): Promise<
+    AppNotification[]
+  > =>
+    delay(notifications),
 
-  /** POST /api/verification (Multer upload) */
-  submitVerification: (docType: string, fileName: string) =>
-  delay({ ok: true as const, docType, fileName }, 700),
+  /** POST /api/verification */
+  submitVerification: (
+    documentType: string,
+    fileName: string
+  ) =>
+    delay(
+      {
+        ok: true as const,
+        documentType,
+        fileName,
+      },
+      700
+    ),
 
   /** GET /api/admin/stats */
-  getAdminStats: () => delay(adminStats)
+  getAdminStats: () =>
+    delay(adminStats),
 };
