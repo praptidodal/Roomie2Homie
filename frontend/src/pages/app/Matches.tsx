@@ -38,18 +38,24 @@ export function Matches() {
 
   async function decide(match: MatchCandidate, action: 'accept' | 'decline') {
     setBusy(match.profile.id);
-    await api.updateMatch(match.profile.id, action);
-    setList(
-      (prev) =>
-      prev?.map((m) =>
-      m.profile.id === match.profile.id ?
-      { ...m, status: action === 'accept' ? 'accepted' : 'declined' } :
-      m
-      ) ?? null
-    );
-    setBusy(null);
-    setDeclining(null);
+    try {
+      await api.updateMatch(match.id || match.profile.id, action);
+      setList(
+        (prev) =>
+        prev?.map((m) =>
+        m.profile.id === match.profile.id ?
+        { ...m, status: action === 'accept' ? 'accepted' : 'declined' } :
+        m
+        ) ?? null
+      );
+    } catch (err: any) {
+      alert(err?.message || 'Failed to update match.');
+    } finally {
+      setBusy(null);
+      setDeclining(null);
+    }
   }
+
 
   const counts = (key: MatchStatus | 'all') => (list ?? []).filter((m) => m.status === key).length;
 
@@ -108,7 +114,7 @@ export function Matches() {
         description="Discovery refreshes every morning with new people who fit your lifestyle."
         action={
         <Link to="/app/discover">
-              <Button variant="gradient">Discover roommates</Button>
+              <Button variant="primary">Discover roommates</Button>
             </Link>
         } /> :
 
@@ -147,7 +153,7 @@ export function Matches() {
           <ul className="mt-4 flex flex-wrap gap-1.5">
                   {m.sharedInterests.map((i) =>
             <li key={i}>
-                      <Badge tone="violet">{i}</Badge>
+                      <Badge tone="sage">{i}</Badge>
                     </li>
             )}
                 </ul>
@@ -162,7 +168,7 @@ export function Matches() {
                 {m.status === 'incoming' &&
             <>
                     <Button
-                variant="gradient"
+                variant="primary"
                 className="flex-1"
                 loading={busy === m.profile.id}
                 icon={<CheckIcon className="h-4 w-4" aria-hidden />}
@@ -181,12 +187,13 @@ export function Matches() {
                   </>
             }
                 {m.status === 'accepted' &&
-            <Link to="/app/chat/t1" className="flex-1">
-                    <Button variant="gradient" block icon={<MessageCircleIcon className="h-4 w-4" aria-hidden />}>
+            <Link to="/app/chat" className="flex-1">
+                    <Button variant="primary" block icon={<MessageCircleIcon className="h-4 w-4" aria-hidden />}>
                       Open chat
                     </Button>
                   </Link>
             }
+
                 {m.status === 'sent' &&
             <Button variant="ghost" className="flex-1" disabled>
                     Awaiting reply
