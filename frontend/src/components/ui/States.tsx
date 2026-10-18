@@ -5,7 +5,7 @@ import { Loader2Icon } from 'lucide-react';
 export function Spinner({ className }: {className?: string;}) {
   return (
     <Loader2Icon
-      className={twMerge('h-5 w-5 animate-spin text-violet-500', className)}
+      className={twMerge('h-5 w-5 animate-spin text-stone-600', className)}
       aria-hidden />);
 
 
@@ -56,7 +56,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cream-300 bg-white px-6 py-16 text-center">
       {icon &&
-      <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-500">
+      <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-sage-100 text-wellness-dark">
           {icon}
         </div>
       }
