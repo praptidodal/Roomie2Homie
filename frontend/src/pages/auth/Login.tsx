@@ -28,10 +28,12 @@ export function Login() {
 
     setError("");
 
-    if (!form.email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
+    const email = form.email.trim();
+
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  setError("Enter a valid email address.");
+  return;
+}
 
     if (!form.password) {
       setError("Please enter your password.");
@@ -42,7 +44,7 @@ export function Login() {
       setLoading(true);
 
       const user = await login(
-        form.email,
+        email,
         form.password
       );
 
