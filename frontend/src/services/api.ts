@@ -59,7 +59,7 @@ async function authenticatedRequest<T>(
     }
   );
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(
@@ -91,7 +91,7 @@ async function uploadRequest<T>(
     }
   );
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(
