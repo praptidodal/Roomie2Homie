@@ -2,7 +2,7 @@ import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
 const base =
-'w-full rounded-2xl border border-cream-300 bg-white px-4 text-sm text-navy-900 placeholder:text-navy-500/60 transition-colors duration-150 ease-out focus:border-violet-400 focus:outline-none focus:ring-4 focus:ring-violet-500/12 disabled:bg-cream-200 disabled:text-navy-500';
+  'w-full min-w-0 max-w-full rounded-2xl border border-stone-200/80 bg-white/95 px-4 text-sm text-wellness-dark placeholder:text-stone-400 transition-colors duration-150 ease-out focus:border-lavender-500 focus:outline-none focus:ring-4 focus:ring-lavender-500/15 disabled:bg-stone-100/70 disabled:text-stone-400 disabled:cursor-not-allowed';
 
 export function Field({
   label,
@@ -11,53 +11,53 @@ export function Field({
   error,
   required,
   children,
-  className
-
-
-
-
-
-
-
-
-}: {label: string;htmlFor?: string;hint?: string;error?: string;required?: boolean;children: React.ReactNode;className?: string;}) {
+  className,
+}: {
+  label: string;
+  htmlFor?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={twMerge('space-y-1.5', className)}>
-      <label htmlFor={htmlFor} className="block text-sm font-semibold text-navy-800">
+    <div className={twMerge('space-y-1.5 min-w-0 w-full', className)}>
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-wellness-dark truncate">
         {label}
-        {required && <span className="ml-0.5 text-coral-400">*</span>}
+        {required && <span className="ml-1 text-peach-500 font-bold">*</span>}
       </label>
       {children}
-      {error ?
-      <p className="text-xs font-semibold text-coral-500">{error}</p> :
-      hint ?
-      <p className="text-xs text-navy-500">{hint}</p> :
-      null}
-    </div>);
-
+      {error ? (
+        <p className="text-xs font-medium text-rose-500">{error}</p>
+      ) : hint ? (
+        <p className="text-xs text-wellness-muted">{hint}</p>
+      ) : null}
+    </div>
+  );
 }
 
 export const Input = React.forwardRef<
   HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>>(
-  function Input({ className, ...rest }, ref) {
-    return <input ref={ref} {...rest} className={twMerge(base, 'h-12', className)} />;
-  });
+  React.InputHTMLAttributes<HTMLInputElement>
+>(function Input({ className, ...rest }, ref) {
+  return <input ref={ref} {...rest} className={twMerge(base, 'h-12', className)} />;
+});
 
 export const Select = React.forwardRef<
   HTMLSelectElement,
-  React.SelectHTMLAttributes<HTMLSelectElement>>(
-  function Select({ className, children, ...rest }, ref) {
-    return (
-      <select ref={ref} {...rest} className={twMerge(base, 'h-12 pr-9', className)}>
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(function Select({ className, children, ...rest }, ref) {
+  return (
+    <select ref={ref} {...rest} className={twMerge(base, 'h-12 pr-9', className)}>
       {children}
-    </select>);
-
-  });
+    </select>
+  );
+});
 
 export const Textarea = React.forwardRef<
   HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  function Textarea({ className, ...rest }, ref) {
-    return <textarea ref={ref} {...rest} className={twMerge(base, 'py-3', className)} />;
-  });
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(function Textarea({ className, ...rest }, ref) {
+  return <textarea ref={ref} {...rest} className={twMerge(base, 'py-3 min-h-[5.5rem]', className)} />;
+});
