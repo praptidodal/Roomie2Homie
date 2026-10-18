@@ -51,15 +51,18 @@ if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       if (user.role === "admin") {
         navigate("/admin", { replace: true });
       } else {
-        const from =
-          (location.state as { from?: string } | null)?.from;
+        const from = (location.state as {
+  from?: string | { pathname?: string };
+} | null)?.from;
 
-        navigate(
-          from && from.startsWith("/app")
-            ? from
-            : "/app/dashboard",
-          { replace: true }
-        );
+const destination = typeof from === "string" ? from : from?.pathname;
+
+navigate(
+  destination && destination.startsWith("/app")
+    ? destination
+    : "/app/dashboard",
+  { replace: true }
+);
       }
     } catch (err) {
       const message =
