@@ -5,10 +5,34 @@ export default {content: [
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        sans: ['Outfit', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Outfit', '"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        handwriting: ['"Reenie Beanie"', 'cursive'],
       },
       colors: {
+        wellness: {
+          DEFAULT: '#FDFCF8',
+          dark: '#292524',
+          muted: '#78716C',
+        },
+        sage: {
+          50: '#F4F7F4',
+          100: '#E8EFE8',
+          200: '#D2E0D2',
+          500: '#5D7A5D',
+        },
+        lavender: {
+          50: '#F8F7FA',
+          100: '#EFEDF4',
+          200: '#DDD7E8',
+          500: '#6E5D87',
+        },
+        peach: {
+          50: '#FFF5F4',
+          100: '#FFE5E3',
+          200: '#FFB7B2',
+          500: '#E06A62',
+        },
         navy: {
           DEFAULT: '#111827',
           900: '#111827',
@@ -53,18 +77,29 @@ export default {content: [
         },
       },
       boxShadow: {
-        soft: '0 2px 6px rgba(17,24,39,0.04), 0 16px 40px -20px rgba(17,24,39,0.18)',
-        lift: '0 24px 50px -24px rgba(124,58,237,0.35)',
-        ring: '0 0 0 4px rgba(124,58,237,0.12)',
+        soft: '0 4px 20px -2px rgba(0,0,0,0.05)',
+        'soft-legacy': '0 2px 6px rgba(17,24,39,0.04), 0 16px 40px -20px rgba(17,24,39,0.18)',
+        floating: '0 12px 36px -4px rgba(41,37,36,0.08)',
+        hover: '0 20px 40px -8px rgba(41,37,36,0.12)',
+        lift: '0 20px 40px -20px rgba(41,37,36,0.14)',
+        ring: '0 0 0 4px rgba(41,37,36,0.08)',
       },
       borderRadius: {
         xl: '1rem',
         '2xl': '1.5rem',
         '3xl': '2rem',
+        '4xl': '2rem',
+        '5xl': '2.5rem',
+        '6xl': '3rem',
       },
-      backgroundImage: {
-        'violet-coral': 'linear-gradient(120deg, #7C3AED 0%, #A855F7 45%, #FF6B6B 100%)',
-        'violet-mint': 'linear-gradient(120deg, #7C3AED 0%, #2DD4BF 100%)',
+      keyframes: {
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-12px)' },
+        },
+      },
+      animation: {
+        'float-slow': 'float-slow 6s ease-in-out infinite',
       },
     },
   },
