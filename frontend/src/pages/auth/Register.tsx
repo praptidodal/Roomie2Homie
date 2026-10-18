@@ -41,10 +41,12 @@ export function Register() {
       return;
     }
 
-    if (!form.email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
+   const email = form.email.trim();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  setError("Enter a valid email address.");
+  return;
+}
 
     if (
       form.phone &&
@@ -71,7 +73,7 @@ export function Register() {
 
       await register({
         name: form.name,
-        email: form.email,
+        email,
         phone: form.phone,
         city: form.city,
         password: form.password,
