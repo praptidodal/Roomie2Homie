@@ -2,6 +2,15 @@ import React from 'react';
 import { twMerge } from 'tailwind-merge';
 import { initials } from '../../utils/format';
 
+function resolveImageUrl(src?: string): string {
+  if (!src) return '';
+  if (/^(https?:|data:|blob:)/i.test(src)) return src;
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const backendOrigin = apiBase.replace(/\/api\/?$/, '');
+  return `${backendOrigin}${src.startsWith('/') ? '' : '/'}${src}`;
+}
+
 const sizes = {
   xs: 'h-8 w-8 text-[11px]',
   sm: 'h-10 w-10 text-xs',
@@ -17,46 +26,55 @@ export function Avatar({
   ring = false,
   online,
   className
+}: {
+  name: string;
+  src?: string | null;
+  size?: keyof typeof sizes;
+  ring?: boolean;
+  online?: boolean;
+  className?: string;
+}) {
+  const [imgError, setImgError] = React.useState(false);
 
+  React.useEffect(() => {
+    setImgError(false);
+  }, [src]);
 
+  const resolvedSrc = src ? resolveImageUrl(src) : '';
 
-
-
-
-
-}: {name: string;src?: string | null;size?: keyof typeof sizes;ring?: boolean;online?: boolean;className?: string;}) {
   return (
     <span className={twMerge('relative inline-flex shrink-0', className)}>
-      {src ?
-      <img
-        src={src}
-        alt={name}
-        className={twMerge(
-          'rounded-full object-cover',
-          sizes[size],
-          ring ? 'ring-2 ring-violet-300 ring-offset-2 ring-offset-white' : 'ring-1 ring-cream-300'
-        )} /> :
-
-
-      <span
-        aria-hidden
-        className={twMerge(
-          'inline-flex items-center justify-center rounded-full bg-violet-coral font-bold text-white',
-          sizes[size]
-        )}>
-        
+      {resolvedSrc && !imgError ? (
+        <img
+          src={resolvedSrc}
+          alt={name}
+          onError={() => setImgError(true)}
+          className={twMerge(
+            'rounded-full object-cover',
+            sizes[size],
+            ring ? 'ring-2 ring-peach-200 ring-offset-2 ring-offset-white' : 'ring-1 ring-stone-200'
+          )}
+        />
+      ) : (
+        <span
+          aria-hidden
+          className={twMerge(
+            'inline-flex items-center justify-center rounded-full bg-sage-200 font-bold text-wellness-dark',
+            sizes[size]
+          )}
+        >
           {initials(name)}
         </span>
-      }
-      {online !== undefined &&
-      <span
-        className={twMerge(
-          'absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-white',
-          online ? 'bg-mint-400' : 'bg-navy-500/40'
-        )}
-        aria-hidden />
-
-      }
-    </span>);
-
+      )}
+      {online !== undefined && (
+        <span
+          className={twMerge(
+            'absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-white',
+            online ? 'bg-mint-400' : 'bg-navy-500/40'
+          )}
+          aria-hidden
+        />
+      )}
+    </span>
+  );
 }
