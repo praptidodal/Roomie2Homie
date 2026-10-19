@@ -28,10 +28,12 @@ export function Login() {
 
     setError("");
 
-    if (!form.email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
+    const email = form.email.trim();
+
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  setError("Enter a valid email address.");
+  return;
+}
 
     if (!form.password) {
       setError("Please enter your password.");
@@ -42,22 +44,25 @@ export function Login() {
       setLoading(true);
 
       const user = await login(
-        form.email,
+        email,
         form.password
       );
 
       if (user.role === "admin") {
         navigate("/admin", { replace: true });
       } else {
-        const from =
-          (location.state as { from?: string } | null)?.from;
+        const from = (location.state as {
+  from?: string | { pathname?: string };
+} | null)?.from;
 
-        navigate(
-          from && from.startsWith("/app")
-            ? from
-            : "/app/dashboard",
-          { replace: true }
-        );
+const destination = typeof from === "string" ? from : from?.pathname;
+
+navigate(
+  destination && destination.startsWith("/app")
+    ? destination
+    : "/app/dashboard",
+  { replace: true }
+);
       }
     } catch (err) {
       const message =

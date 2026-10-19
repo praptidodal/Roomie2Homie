@@ -133,3 +133,11 @@ export interface CurrentUser {
   quizCompleted: boolean;
   profileStrength: number;
 }
+
+export interface ApiError {
+  message: string;
+  errors?: Array<{
+    msg: string;
+    path?: string;
+  }>;
+}

@@ -124,7 +124,10 @@ export function AuthProvider({
           },
         });
 
-        const data: AuthResponse = await response.json();
+        const data: AuthResponse = await response.json().catch(() => ({
+        success: false,
+        message: "Invalid response from server",
+    }));
 
         if (response.ok && data.success && data.user) {
           const mappedUser = mapBackendUser(data.user);
@@ -172,7 +175,10 @@ export function AuthProvider({
         }),
       });
 
-      const data: AuthResponse = await response.json();
+      const data: AuthResponse = await response.json().catch(() => ({
+      success: false,
+      message: "Invalid response from server",
+    }));
 
       if (!response.ok || !data.success || !data.token || !data.user) {
         throw new Error(
@@ -214,7 +220,10 @@ export function AuthProvider({
         }),
       });
 
-      const data: AuthResponse = await response.json();
+      const data: AuthResponse = await response.json().catch(() => ({
+      success: false,
+      message: "Invalid response from server",
+    }));
 
       if (!response.ok || !data.success || !data.token || !data.user) {
         throw new Error(
