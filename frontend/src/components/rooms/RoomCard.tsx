@@ -1,3 +1,4 @@
+// Reusable room card for presenting room information consistently across listings.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BedDoubleIcon, MapPinIcon, SofaIcon, UsersIcon } from 'lucide-react';

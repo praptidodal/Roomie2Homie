@@ -1,3 +1,4 @@
+// Rooms page: displays available room listings and supports the room browsing flow.
 import React, { useEffect, useMemo, useState } from 'react';
 import { HomeIcon, SlidersHorizontalIcon } from 'lucide-react';
 import type { Room } from '../../types';
