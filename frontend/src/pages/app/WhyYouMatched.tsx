@@ -1,3 +1,4 @@
+// Matching explanation page: shows why a roommate or room matches the user's preferences.
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
