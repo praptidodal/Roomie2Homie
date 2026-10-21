@@ -1,3 +1,4 @@
+// Shared footer component used across the application's public and authenticated pages.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InstagramIcon, LinkedinIcon, MailIcon, TwitterIcon } from 'lucide-react';

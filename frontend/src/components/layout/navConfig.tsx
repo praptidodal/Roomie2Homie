@@ -1,3 +1,4 @@
+// Central navigation configuration used to keep application routes and labels consistent.
 import React from 'react';
 import {
   BellIcon,
