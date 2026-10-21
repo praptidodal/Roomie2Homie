@@ -1,3 +1,4 @@
+// Reusable roommate card for displaying profile and compatibility information.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BriefcaseIcon, CalendarCheckIcon, MapPinIcon, WalletIcon } from 'lucide-react';
