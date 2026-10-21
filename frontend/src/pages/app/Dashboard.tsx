@@ -1,3 +1,4 @@
+// Dashboard page: presents the user's main application overview and related sections.
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
