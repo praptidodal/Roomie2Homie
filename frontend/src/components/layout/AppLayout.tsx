@@ -1,3 +1,4 @@
+// Main application layout that provides shared navigation and page structure.
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';

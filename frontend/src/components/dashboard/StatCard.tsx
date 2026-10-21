@@ -1,3 +1,4 @@
+// Reusable dashboard card for displaying a key statistic with consistent styling.
 import React from 'react';
 import { Link } from 'react-router-dom';
 
