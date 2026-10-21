@@ -1,3 +1,4 @@
+// Shared dashboard header component used to keep page titles and actions consistent.
 import React from 'react';
 
 export function PageHeader({

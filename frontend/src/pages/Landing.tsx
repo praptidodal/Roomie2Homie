@@ -1,3 +1,4 @@
+// Landing page: introduces the application and guides visitors into the main user flows.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
