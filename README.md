@@ -341,10 +341,10 @@ Review the conflicting files carefully, resolve the conflict markers, and test t
 This project is developed collaboratively by the following MCA students:
 
 1. **Twinkle Singh**
-2. **Rujuta**
-3. **Prapti**
-4. **Tanvi**
-5. **Rashita**
+2. **Rujuta Dani**
+3. **Prapti Dodal**
+4. **Tanvi Ballal**
+5. **Rashita Jomes**
 
 *Developed as an MCA group project.*
 ## 📚 Project Documentation
