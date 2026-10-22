@@ -344,7 +344,7 @@ This project is developed collaboratively by the following MCA students:
 2. **Rujuta Dani**
 3. **Prapti Dodal**
 4. **Tanvi Ballal**
-5. **Rashita Gomes**
+5. **Rashita Jomes**
 
 *Developed as an MCA group project.*
 ## 📚 Project Documentation
