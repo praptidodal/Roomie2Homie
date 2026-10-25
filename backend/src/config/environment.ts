@@ -19,7 +19,7 @@ const nodeEnv = (process.env.NODE_ENV || 'development') as 'development' | 'prod
 // Default to 5001 because port 5000 is occupied by macOS AirPlay Receiver (ControlCenter)
 const port = parseInt(process.env.PORT || '5001', 10);
 const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-const mongodbUri = (process.env.MONGODB_URI || '').trim();
+const mongodbUri = (process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/roomie2homie').trim();
 const jwtSecret = (process.env.JWT_SECRET || '').trim();
 const jwtExpiresIn = (process.env.JWT_EXPIRES_IN || '7d').trim();
 const verificationEncryptionKey = (process.env.VERIFICATION_ENCRYPTION_KEY || jwtSecret || '').trim();

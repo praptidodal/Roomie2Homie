@@ -17,11 +17,7 @@ import { sanitizeMongoError } from '../src/config/database';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const mongodbUri = (process.env.MONGODB_URI || '').trim();
-if (!mongodbUri) {
-  console.error('❌ MONGODB_URI is not configured. Aborting.');
-  process.exit(1);
-}
+const mongodbUri = (process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/roomie2homie').trim();
 
 const adminEmail = (process.argv[2] || process.env.ADMIN_EMAIL || '').trim().toLowerCase();
 if (!adminEmail) {

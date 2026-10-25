@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { RoomEnquiry, IRoomEnquiry } from '../models/RoomEnquiry';
 import { Room, IRoom } from '../models/Room';
-import { User, IUser } from '../../models/User';
+import { User, IUser } from '../models/User';
 import { AppError } from '../middlewares/error.middleware';
 import { createNotification } from '../services/notification.service';
 

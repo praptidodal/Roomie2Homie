@@ -13,7 +13,6 @@ async function startServer(): Promise<void> {
     validateEnvironment();
 
     // 2. Connect to MongoDB before accepting requests
-    console.log('⏳ Connecting to MongoDB...');
     await connectDatabase();
 
     // 3. Start listening for incoming HTTP connections

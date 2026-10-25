@@ -3,7 +3,7 @@ import { isValidObjectId, Types } from 'mongoose';
 import { ChatThread, IChatThread } from '../models/ChatThread';
 import { ChatMessage, IChatMessage } from '../models/ChatMessage';
 import { MatchRequest } from '../models/MatchRequest';
-import { User, IUser } from '../../models/User';
+import { User, IUser } from '../models/User';
 import { AppError } from '../middlewares/error.middleware';
 import { toCandidateProfileDTO } from '../utils/dto';
 import { createNotification } from '../services/notification.service';

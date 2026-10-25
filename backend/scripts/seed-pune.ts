@@ -28,12 +28,7 @@ import { encryptIdNumber, maskIdNumber } from '../src/services/verification.serv
 import { calcCompatibility } from '../src/utils/compatibility';
 import { calcProfileStrength } from '../src/utils/dto';
 
-const MONGODB_URI = (process.env.MONGODB_URI || '').trim();
-
-if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is not configured in backend/.env');
-  process.exit(1);
-}
+const MONGODB_URI = (process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/roomie2homie').trim();
 
 // Fixed seed tag for safe idempotent re-runs
 const SEED_TAG = 'PUNE_DEV_SEED';
@@ -42,7 +37,7 @@ const SEED_EMAIL_DOMAIN = '@roomie2homie.seed';
 async function runSeed() {
   console.log('🌱 Starting Roomie2Homie Pune/MIT-WPU synthetic seeding...');
   await mongoose.connect(MONGODB_URI);
-  console.log('✅ Connected to MongoDB Atlas:', mongoose.connection.name);
+  console.log('✅ Connected to MongoDB database:', mongoose.connection.name);
 
   // Passwords configured via environment variables with safe development defaults
   const defaultPassword = process.env.SEED_DEFAULT_PASSWORD || 'Dev@Roomie2026';

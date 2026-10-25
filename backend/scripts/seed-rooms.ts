@@ -28,11 +28,7 @@ import mongoose from 'mongoose';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // ── Safety: database URI check ───────────────────────────────────────────────
-const mongodbUri = (process.env.MONGODB_URI || '').trim();
-if (!mongodbUri) {
-  console.error('❌  MONGODB_URI is not configured. Aborting.');
-  process.exit(1);
-}
+const mongodbUri = (process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/roomie2homie').trim();
 
 const allowProductionSeed = process.env.ALLOW_PRODUCTION_SEED === 'true';
 const isLikelySafeTarget =

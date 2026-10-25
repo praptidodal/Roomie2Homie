@@ -1,13 +1,24 @@
+# Dependencies
 node_modules/
+
+# Production build output
+dist/
+
+# Environment files and secrets
 .env
 .env.*
 !.env.example
-dist/
-coverage/
-logs/
+
+# Logs
+logs
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+
+# OS artifacts
 .DS_Store
 Thumbs.db
+
+# Uploaded files
 uploads/
