@@ -1,15 +1,6 @@
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
-import { initials } from '../../utils/format';
-
-function resolveImageUrl(src?: string): string {
-  if (!src) return '';
-  if (/^(https?:|data:|blob:)/i.test(src)) return src;
-
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-  const backendOrigin = apiBase.replace(/\/api\/?$/, '');
-  return `${backendOrigin}${src.startsWith('/') ? '' : '/'}${src}`;
-}
+import { initials, resolveImageUrl } from '../../utils/format';
 
 const sizes = {
   xs: 'h-8 w-8 text-[11px]',

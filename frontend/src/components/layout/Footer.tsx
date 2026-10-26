@@ -1,4 +1,3 @@
-// Shared footer component used across the application's public and authenticated pages.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InstagramIcon, LinkedinIcon, MailIcon, TwitterIcon } from 'lucide-react';
@@ -78,7 +77,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-cream-200/50 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>© {new Date().getFullYear()} Roomie2Homie. Built for students and young professionals.</p>
-          <p>Mock data only · no real listings</p>
+          <p>Verified roommate matching and shared living listings.</p>
         </div>
       </div>
     </footer>);

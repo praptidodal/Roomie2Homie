@@ -1,4 +1,3 @@
-// Reusable roommate card for displaying profile and compatibility information.
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BriefcaseIcon, CalendarCheckIcon, MapPinIcon, WalletIcon } from 'lucide-react';
@@ -12,30 +11,32 @@ import { CompatibilityRing } from '../ui/CompatibilityRing';
 export function RoommateCard({
   match,
   onRequest,
-  pending
-
-
-
-
-}: {match: MatchCandidate;onRequest?: (m: MatchCandidate) => void;pending?: boolean;}) {
+  pending,
+}: {
+  match: MatchCandidate;
+  onRequest?: (m: MatchCandidate) => void;
+  pending?: boolean;
+}) {
   const p = match.profile;
   return (
-    <article className="group relative overflow-hidden rounded-3xl border border-cream-300 bg-white shadow-soft transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-1 hover:border-violet-200 hover:shadow-lift">
-      <div className="h-1.5 w-full bg-violet-coral" aria-hidden />
-      <div className="p-5 sm:p-6">
+    <article className="group relative overflow-hidden rounded-[2.5rem] border border-stone-200/70 bg-white/95 shadow-soft transition-all duration-200 ease-out hover:-translate-y-1 hover:border-stone-300 hover:shadow-floating">
+      <div className="h-1 w-full bg-sage-200" aria-hidden />
+      <div className="p-6 sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 gap-4">
             <Avatar name={p.name} src={p.avatar} size="md" ring />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-display text-lg font-bold text-navy-900">{p.name}</h3>
+                <h3 className="font-display text-lg font-bold tracking-tight text-wellness-dark">
+                  {p.name}
+                </h3>
                 <VerificationBadge status={p.verification} />
               </div>
-              <p className="mt-0.5 text-sm text-navy-500">
-                {p.age} · {titleCase(p.gender)} · {p.lastActive}
+              <p className="mt-0.5 text-xs text-wellness-muted">
+                {[p.age, p.gender && p.gender !== 'prefer_not_to_say' ? titleCase(p.gender) : null, p.lastActive].filter(Boolean).join(' · ')}
               </p>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-navy-600">
-                <BriefcaseIcon className="h-4 w-4 text-navy-500/70" aria-hidden />
+              <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-wellness-dark/80">
+                <BriefcaseIcon className="h-3.5 w-3.5 text-stone-400" aria-hidden />
                 {p.occupation} at {p.company}
               </p>
             </div>
@@ -43,62 +44,62 @@ export function RoommateCard({
           <CompatibilityRing score={match.score} tone={scoreTone(match.score)} size="md" />
         </div>
 
-        <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-navy-600">{p.bio}</p>
+        <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-wellness-muted">{p.bio}</p>
 
-        <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-cream-200 p-3.5 text-sm">
+        <dl className="mt-5 grid grid-cols-2 gap-3 rounded-2xl border border-stone-100 bg-stone-50/70 p-3.5 text-xs">
           <div className="flex items-center gap-2">
-            <MapPinIcon className="h-4 w-4 shrink-0 text-violet-500" aria-hidden />
-            <dd className="truncate font-semibold text-navy-800">{p.locality}</dd>
+            <MapPinIcon className="h-3.5 w-3.5 shrink-0 text-lavender-500" aria-hidden />
+            <dd className="truncate font-semibold text-wellness-dark">{p.locality}</dd>
           </div>
           <div className="flex items-center gap-2">
-            <WalletIcon className="h-4 w-4 shrink-0 text-mint-500" aria-hidden />
-            <dd className="font-semibold text-navy-800">{rupees(p.budget)}/mo</dd>
+            <WalletIcon className="h-3.5 w-3.5 shrink-0 text-sage-500" aria-hidden />
+            <dd className="font-semibold text-wellness-dark">{rupees(p.budget)}/mo</dd>
           </div>
           <div className="flex items-center gap-2">
-            <CalendarCheckIcon className="h-4 w-4 shrink-0 text-coral-400" aria-hidden />
-            <dd className="truncate font-semibold text-navy-800">{monthDay(p.moveIn)}</dd>
+            <CalendarCheckIcon className="h-3.5 w-3.5 shrink-0 text-peach-500" aria-hidden />
+            <dd className="truncate font-semibold text-wellness-dark">{monthDay(p.moveIn)}</dd>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-4 w-4 shrink-0 rounded-full bg-violet-200" aria-hidden />
-            <dd className="truncate font-semibold text-navy-800">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-lavender-200" aria-hidden />
+            <dd className="truncate font-semibold text-wellness-dark">
               {titleCase(p.lifestyle.sleep)}
             </dd>
           </div>
         </dl>
 
         <ul className="mt-4 flex flex-wrap gap-1.5">
-          {p.interests.slice(0, 4).map((interest) =>
-          <li key={interest}>
-              <Badge tone={match.sharedInterests.includes(interest) ? 'violet' : 'neutral'}>
+          {p.interests.slice(0, 4).map((interest) => (
+            <li key={interest}>
+              <Badge tone={match.sharedInterests.includes(interest) ? 'sage' : 'neutral'}>
                 {interest}
               </Badge>
             </li>
-          )}
+          ))}
         </ul>
 
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2.5">
           <Link to={`/app/discover/${p.id}`} className="flex-1">
             <Button variant="secondary" block>
               Why you matched
             </Button>
           </Link>
-          {onRequest &&
-          <Button
-            variant="gradient"
-            className="flex-1"
-            loading={pending}
-            onClick={() => onRequest(match)}
-            disabled={match.status === 'sent' || match.status === 'accepted'}>
-            
-              {match.status === 'sent' ?
-            'Request sent' :
-            match.status === 'accepted' ?
-            'Matched' :
-            'Send request'}
+          {onRequest && (
+            <Button
+              variant="primary"
+              className="flex-1"
+              loading={pending}
+              onClick={() => onRequest(match)}
+              disabled={match.status === 'sent' || match.status === 'accepted'}
+            >
+              {match.status === 'sent'
+                ? 'Request sent'
+                : match.status === 'accepted'
+                ? 'Matched'
+                : 'Send request'}
             </Button>
-          }
+          )}
         </div>
       </div>
-    </article>);
-
+    </article>
+  );
 }

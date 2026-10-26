@@ -15,16 +15,16 @@ export function monthDay(iso: string): string {
 }
 
 export function initials(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
+  return name.
+  split(' ').
+  filter(Boolean).
+  slice(0, 2).
+  map((p) => p[0]?.toUpperCase()).
+  join('');
 }
 
-export function titleCase(value: string): string {
+export function titleCase(value?: string): string {
+  if (!value) return '';
   return value.
   replace(/_/g, ' ').
   replace(/\b\w/g, (c) => c.toUpperCase());
@@ -41,4 +41,24 @@ export function greeting(): string {
   if (h < 12) return 'Good morning';
   if (h < 17) return 'Good afternoon';
   return 'Good evening';
+}
+
+/**
+ * Resolves room and profile image URLs.
+ * Leaves absolute URLs (http, https, data, blob) intact.
+ * Prepends backend origin to relative upload paths (e.g. /uploads/rooms/...)
+ */
+export function resolveImageUrl(src?: string): string {
+  if (!src) return '';
+  if (
+    src.startsWith('http://') ||
+    src.startsWith('https://') ||
+    src.startsWith('data:') ||
+    src.startsWith('blob:')
+  ) {
+    return src;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+  const backendOrigin = apiBase.replace(/\/api\/?$/, '');
+  return `${backendOrigin}${src.startsWith('/') ? '' : '/'}${src}`;
 }

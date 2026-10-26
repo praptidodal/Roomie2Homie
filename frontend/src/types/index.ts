@@ -27,7 +27,7 @@ export interface Profile {
   id: string;
   name: string;
   age: number;
-  gender: 'female' | 'male' | 'non_binary';
+  gender?: 'female' | 'male' | 'non_binary' | 'prefer_not_to_say';
   avatar: string;
   occupation: string;
   company: string;
@@ -54,6 +54,7 @@ export interface CompatibilityFactor {
 }
 
 export interface MatchCandidate {
+  id?: string;
   profile: Profile;
   score: number;
   status: MatchStatus;
@@ -96,6 +97,7 @@ export interface ChatMessage {
 export interface ChatThread {
   id: string;
   participantId: string;
+  participant?: Profile;
   lastMessage: string;
   lastAt: string;
   unread: number;
@@ -103,6 +105,7 @@ export interface ChatThread {
   typing?: boolean;
   context: string;
 }
+
 
 export type NotificationKind =
 'match_request' |
@@ -132,12 +135,6 @@ export interface CurrentUser {
   verification: VerificationStatus;
   quizCompleted: boolean;
   profileStrength: number;
-}
-
-export interface ApiError {
-  message: string;
-  errors?: Array<{
-    msg: string;
-    path?: string;
-  }>;
+  lifestyle?: Lifestyle;
+  gender?: 'female' | 'male' | 'non_binary' | 'prefer_not_to_say';
 }

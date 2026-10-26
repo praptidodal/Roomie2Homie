@@ -1,7 +1,8 @@
-// Rooms page: displays available room listings and supports the room browsing flow.
-import React, { useEffect, useMemo, useState } from 'react';
-import { HomeIcon, SlidersHorizontalIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { HomeIcon, PlusIcon, SlidersHorizontalIcon, XIcon, RotateCcwIcon } from 'lucide-react';
 import type { Room } from '../../types';
+
 import { PageHeader } from '../../components/dashboard/PageHeader';
 import { RoomCard } from '../../components/rooms/RoomCard';
 import { Button } from '../../components/ui/Button';
@@ -9,6 +10,8 @@ import { Card } from '../../components/ui/Card';
 import { Field, Input, Select } from '../../components/ui/Field';
 import { Modal } from '../../components/ui/Modal';
 import { EmptyState, SkeletonCard } from '../../components/ui/States';
+import { FloatingBlob } from '../../components/ui/FloatingBlob';
+import { RevealOnScroll } from '../../components/ui/RevealOnScroll';
 import { api } from '../../services/api';
 import { cities } from '../../data/mock';
 
@@ -17,8 +20,8 @@ const defaults = {
   city: 'All cities',
   type: 'any',
   furnishing: 'any',
-  maxRent: 30000,
-  verifiedOnly: false
+  maxRent: 40000,
+  verifiedOnly: false,
 };
 
 export function Rooms() {
@@ -28,7 +31,6 @@ export function Rooms() {
 
   useEffect(() => {
     let alive = true;
-    // TODO: GET /api/rooms?filters
     api.getRooms().then((r) => alive && setAll(r));
     return () => {
       alive = false;
@@ -49,34 +51,49 @@ export function Rooms() {
     });
   }, [all, filters]);
 
-  const controls =
-  <div className="space-y-4">
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.q.trim()) count++;
+    if (filters.city !== 'All cities') count++;
+    if (filters.type !== 'any') count++;
+    if (filters.furnishing !== 'any') count++;
+    if (filters.maxRent < 40000) count++;
+    if (filters.verifiedOnly) count++;
+    return count;
+  }, [filters]);
+
+  const controls = (
+    <div className="space-y-4">
       <Field label="Search" htmlFor="rq">
         <Input
-        id="rq"
-        value={filters.q}
-        onChange={(e) => setFilters({ ...filters, q: e.target.value })}
-        placeholder="Locality or keyword" />
-      
+          id="rq"
+          value={filters.q}
+          onChange={(e) => setFilters({ ...filters, q: e.target.value })}
+          placeholder="Locality or keyword"
+        />
       </Field>
+
       <Field label="City" htmlFor="rcity">
         <Select
-        id="rcity"
-        value={filters.city}
-        onChange={(e) => setFilters({ ...filters, city: e.target.value })}>
-        
+          id="rcity"
+          value={filters.city}
+          onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+        >
           <option>All cities</option>
-          {cities.map((c) =>
-        <option key={c} value={c}>{c}</option>
-        )}
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </Select>
       </Field>
+
       <Field label="Room type" htmlFor="rtype">
         <Select
-        id="rtype"
-        value={filters.type}
-        onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
-        
+          id="rtype"
+          value={filters.type}
+          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+        >
           <option value="any">Any type</option>
           <option value="private_room">Private room</option>
           <option value="shared_room">Shared room</option>
@@ -84,113 +101,251 @@ export function Rooms() {
           <option value="full_flat">Full flat</option>
         </Select>
       </Field>
+
       <Field label="Furnishing" htmlFor="rfurn">
         <Select
-        id="rfurn"
-        value={filters.furnishing}
-        onChange={(e) => setFilters({ ...filters, furnishing: e.target.value })}>
-        
+          id="rfurn"
+          value={filters.furnishing}
+          onChange={(e) => setFilters({ ...filters, furnishing: e.target.value })}
+        >
           <option value="any">Any</option>
           <option value="furnished">Furnished</option>
           <option value="semi_furnished">Semi furnished</option>
           <option value="unfurnished">Unfurnished</option>
         </Select>
       </Field>
-      <Field label={`Maximum rent · ₹${filters.maxRent.toLocaleString('en-IN')}`} htmlFor="rrent">
+
+      <Field
+        label={`Maximum rent · ₹${filters.maxRent.toLocaleString('en-IN')}`}
+        htmlFor="rrent"
+      >
         <input
-        id="rrent"
-        type="range"
-        min={8000}
-        max={40000}
-        step={1000}
-        value={filters.maxRent}
-        onChange={(e) => setFilters({ ...filters, maxRent: Number(e.target.value) })}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-cream-300 accent-violet-600" />
-      
+          id="rrent"
+          type="range"
+          min={8000}
+          max={40000}
+          step={1000}
+          value={filters.maxRent}
+          onChange={(e) => setFilters({ ...filters, maxRent: Number(e.target.value) })}
+          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-sage-600"
+        />
       </Field>
-      <label className="flex items-center gap-2.5 text-sm font-semibold text-navy-700">
+
+      <label className="flex items-center gap-2.5 text-xs font-semibold text-wellness-dark cursor-pointer pt-1">
         <input
-        type="checkbox"
-        checked={filters.verifiedOnly}
-        onChange={(e) => setFilters({ ...filters, verifiedOnly: e.target.checked })}
-        className="h-4 w-4 rounded border-cream-300 text-violet-600 focus:ring-violet-400" />
-      
+          type="checkbox"
+          checked={filters.verifiedOnly}
+          onChange={(e) => setFilters({ ...filters, verifiedOnly: e.target.checked })}
+          className="h-4 w-4 rounded border-stone-300 text-sage-600 focus:ring-sage-500 accent-sage-600"
+        />
         Verified listings only
       </label>
-      <Button variant="ghost" block onClick={() => setFilters(defaults)}>
-        Reset filters
-      </Button>
-    </div>;
 
+      {activeFiltersCount > 0 && (
+        <Button
+          variant="ghost"
+          block
+          size="sm"
+          onClick={() => setFilters(defaults)}
+          icon={<RotateCcwIcon className="h-3.5 w-3.5" aria-hidden />}
+        >
+          Reset filters
+        </Button>
+      )}
+    </div>
+  );
 
   return (
-    <div>
+    <div className="relative">
+      <FloatingBlob tone="sage" size="lg" className="-top-12 -left-20 opacity-60" />
+      <FloatingBlob tone="peach" size="md" className="top-1/3 -right-20 opacity-50" />
+
       <PageHeader
-        eyebrow="Rooms"
-        title="Rooms and flats posted by members"
-        description="Each listing shows who already lives there, the house rules and the full monthly bill split."
+        eyebrow="ROOMS"
+        title="Find a place that fits your life"
+        description="Explore flats and rooms posted by community members, with transparent house rules and bill splits."
         action={
-        <Button
-          variant="secondary"
-          className="lg:hidden"
-          onClick={() => setSheet(true)}
-          icon={<SlidersHorizontalIcon className="h-4 w-4" aria-hidden />}>
-          
-            Filters
-          </Button>
-        } />
-      
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              className="lg:hidden"
+              onClick={() => setSheet(true)}
+              icon={<SlidersHorizontalIcon className="h-4 w-4" aria-hidden />}
+            >
+              Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
+            </Button>
+            <Link to="/app/rooms/create">
+              <Button
+                variant="primary"
+                icon={<PlusIcon className="h-4 w-4" aria-hidden />}
+              >
+                Post a room
+              </Button>
+            </Link>
+          </div>
+        }
+      />
+
+      {/* Active filter pill tags */}
+      {activeFiltersCount > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-wellness-muted mr-1">Active:</span>
+
+          {filters.q.trim() && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              &quot;{filters.q}&quot;
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, q: '' })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove search filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.city !== 'All cities' && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              {filters.city}
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, city: 'All cities' })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove city filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.type !== 'any' && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              {filters.type.replace('_', ' ')}
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, type: 'any' })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove room type filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.furnishing !== 'any' && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              {filters.furnishing.replace('_', ' ')}
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, furnishing: 'any' })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove furnishing filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.maxRent < 40000 && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              Under ₹{filters.maxRent.toLocaleString('en-IN')}
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, maxRent: 40000 })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove rent ceiling filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.verifiedOnly && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-50 border border-sage-200/80 px-3 py-1 text-xs font-medium text-wellness-dark">
+              Verified only
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, verifiedOnly: false })}
+                className="text-wellness-muted hover:text-wellness-dark"
+                aria-label="Remove verified filter"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setFilters(defaults)}
+            className="text-xs font-semibold text-sage-700 hover:text-sage-800 ml-1 underline"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[17rem_1fr]">
+        {/* Desktop filter sidebar */}
         <aside className="hidden lg:block">
-          <Card className="sticky top-24">
-            <h2 className="mb-4 flex items-center gap-2 font-display text-base font-bold text-navy-900">
-              <SlidersHorizontalIcon className="h-4 w-4 text-violet-500" aria-hidden />
+          <Card className="sticky top-24 rounded-3xl border border-stone-200/80 bg-white/95 p-5 shadow-soft backdrop-blur-sm">
+            <h2 className="mb-4 flex items-center gap-2 font-display text-base font-bold text-wellness-dark">
+              <SlidersHorizontalIcon className="h-4 w-4 text-sage-600" aria-hidden />
               Filters
             </h2>
             {controls}
           </Card>
         </aside>
 
+        {/* Room listing results */}
         <section>
-          {!all ?
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {!all ? (
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               <SkeletonCard />
               <SkeletonCard />
               <SkeletonCard />
-            </div> :
-          results.length === 0 ?
-          <EmptyState
-            icon={<HomeIcon className="h-6 w-6" aria-hidden />}
-            title="No rooms match these filters"
-            description="Try raising the rent ceiling or removing the furnishing filter."
-            action={
-            <Button variant="gradient" onClick={() => setFilters(defaults)}>
+            </div>
+          ) : results.length === 0 ? (
+            <EmptyState
+              icon={<HomeIcon className="h-6 w-6" aria-hidden />}
+              title="No rooms match these filters"
+              description="Try adjusting your filters, raising the rent ceiling, or clearing search criteria."
+              action={
+                <Button variant="primary" onClick={() => setFilters(defaults)}>
                   Reset filters
                 </Button>
-            } /> :
-
-
-          <>
-              <p className="mb-4 text-sm text-navy-500">
-                <span className="font-bold text-navy-900">{results.length}</span> rooms available
+              }
+            />
+          ) : (
+            <>
+              <p className="mb-4 text-xs font-semibold text-wellness-muted">
+                <span className="font-bold text-wellness-dark font-display">{results.length}</span>{' '}
+                {results.length === 1 ? 'room' : 'rooms'} available
               </p>
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {results.map((room) =>
-              <RoomCard key={room.id} room={room} />
-              )}
-              </div>
+              <RevealOnScroll>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {results.map((room) => (
+                    <RoomCard key={room.id} room={room} />
+                  ))}
+                </div>
+              </RevealOnScroll>
             </>
-          }
+          )}
         </section>
       </div>
 
+      {/* Mobile filter bottom sheet modal */}
       <Modal open={sheet} onClose={() => setSheet(false)} title="Filters" size="sm">
         {controls}
-        <Button variant="gradient" block className="mt-5" onClick={() => setSheet(false)}>
+        <Button
+          variant="primary"
+          block
+          className="mt-5"
+          onClick={() => setSheet(false)}
+        >
           Show {results.length} rooms
         </Button>
       </Modal>
-    </div>);
-
+    </div>
+  );
 }
